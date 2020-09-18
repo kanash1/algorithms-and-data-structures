@@ -1,34 +1,31 @@
 // main idea of program: E = A ⋃ B ⋃ C ⋂ D
 
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
-struct Set {
+struct List {
 	char element;
-	Set* next;
+	List* next;
 
-	Set(char e, Set* n = nullptr) : element(e), next(n) { }
-	~Set() { delete next; }
+	List(char e, List* n = nullptr) : element(e), next(n) { }
+	~List() { delete next; }
 };
 
 /*----------------------------------------------------------
 					   ARRAY FUNCTIONS
- --------------------------------------------------------*/
+  ----------------------------------------------------------*/
 
-bool IsInArray(char* set, char element) {
-	for (int i = 0; set[i]; ++i)
-		if (element == set[i])
+bool IsInArray(char S[], char element) {
+	for (int i = 0; S[i]; ++i)
+		if (element == S[i])
 			return true;
 	return false;
 }
 
-void getSet(char* set, char setName) {			// НЕОБХОДИМО
-	cout << "Enter set " << setName << " : ";	// ОБЯЗАТЕЛЬНО
-	cin >> set;									// ЗАМЕНИТЬ
-}
-
-void makeArraySet(char* A, char* B, char* C, char* D) {
+void makeArraySet(char A[], char B[], char C[], char D[]) {
 
 	const int NumOfDigits = 10;
 	char E[NumOfDigits + 1] = {};
@@ -47,89 +44,62 @@ void makeArraySet(char* A, char* B, char* C, char* D) {
 			if (!(IsInArray(E, C[i])))
 				E[size++] = C[i];
 
-	cout << "The set E was made like array: " << E << endl;
+	cout << "The set E was made like array: " << E << '\n';
+}
+
+void getSet(char set[], char setName) {			// НЕОБХОДИМО
+	cout << "Enter set " << setName << " : ";	// ОБЯЗАТЕЛЬНО
+	cin >> set;									// ЗАМЕНИТЬ
 }
 
 /*----------------------------------------------------------
 						LIST FUNCTIONS
- --------------------------------------------------------*/
+  ----------------------------------------------------------*/
 
-Set* ConversionToList(char* S) {
-	Set* LS = nullptr;
-	Set* node = nullptr;
-	for (int i = 0; S[i] != '\0'; ++i) {
-		if (!LS) {
-			node = new Set(S[i]);
-			LS = node;
-		}
-		else {
-			node->next = new Set(S[i]);
-			node = node->next;
-		}
+List* ConversionToList(char S[]) {
+	List* LS = nullptr;
+	for (int i = 0; S[i]; ++i) {
+		LS = new List(S[i], LS);
 	}
 	return LS;
 }
 
-bool IsInList(Set* LS, char& element) {
-	for (Set* p = LS; p; p = p->next)
+bool IsInList(List* LS, char element) {
+	for (List* p = LS; p; p = p->next)
 		if (element == p->element)
 			return true;
 	return false;
 }
 
-void PrintList(Set* LS) {
+void PrintList(List* LS) {
 	cout << "The set E was made like list: ";
-	for (Set* p = LS; p; p = p->next) {
+	for (List* p = LS; p; p = p->next) {
 		cout << p->element;
 	}
-	cout << endl;
+	cout << '\n';
 }
 
-void makeListSet(char* A, char* B, char* C, char* D) {
+void makeListSet(char A[], char B[], char C[], char D[]) {
 
-	Set* LA = ConversionToList(A),
+	List
+		* LA = ConversionToList(A),
 		* LB = ConversionToList(B),
 		* LC = ConversionToList(C),
 		* LD = ConversionToList(D),
-		* LE = nullptr,
-		* node = nullptr;
+		* LE = nullptr;
 
-	for (Set* p = LA; p; p = p->next)
-		if (!(IsInList(LE, p->element))) {
-			if (!LE) {
-				node = new Set(p->element);
-				LE = node;
-			}
-			else {
-				node->next = new Set(p->element);
-				node = node->next;
-			}
-		}
+	for (List* p = LA; p; p = p->next)
+		if (!(IsInList(LE, p->element)))
+			LE = new List(p->element, LE);
 
-	for (Set* p = LB; p; p = p->next)
-		if (!(IsInList(LE, p->element))) {
-			if (!LE) {
-				node = new Set(p->element);
-				LE = node;
-			}
-			else {
-				node->next = new Set(p->element);
-				node = node->next;
-			}
-		}
+	for (List* p = LB; p; p = p->next)
+		if (!(IsInList(LE, p->element)))
+			LE = new List(p->element, LE);
 
-	for (Set* p = LC; p; p = p->next)
+	for (List* p = LC; p; p = p->next)
 		if (IsInList(LD, p->element))
-			if (!(IsInList(LE, p->element))) {
-				if (!LE) {
-					node = new Set(p->element);
-					LE = node;
-				}
-				else {
-					node->next = new Set(p->element);
-					node = node->next;
-				}
-			}
+			if (!(IsInList(LE, p->element)))
+				LE = new List(p->element, LE);
 
 	PrintList(LE);
 	delete LA;
@@ -141,31 +111,30 @@ void makeListSet(char* A, char* B, char* C, char* D) {
 
 /*----------------------------------------------------------
 					 BITS VECTOR FUNCTIONS
- --------------------------------------------------------*/
+  ----------------------------------------------------------*/
 
-void ConversionToBitsVector(char* S, char* bS) {
+void ConversionToBitsVector(char S[], char bS[]) {
 	for (int i = 0; S[i]; ++i)
 		bS[S[i] - '0'] = 1;
 }
 
-void ReverseFromBitsVector(char* bS) {
+void ReverseFromBitsVector(char bS[], char S[]) {
 	const int NumOfDigits = 10;
-	char S[NumOfDigits + 1] = {};
 	for (int i = 0, k = 0; i < NumOfDigits; ++i)
 		if (bS[i])
 			S[k++] = i + '0';
-	cout << S << endl;
 }
 
-void makeBitsVectorSet(char* A, char* B, char* C, char* D) {
+void makeBitsVectorSet(char A[], char B[], char C[], char D[]) {
 
 	const int NumOfDigits = 10;
-
-	char bA[NumOfDigits + 1] = {},
+	char
+		bA[NumOfDigits + 1] = {},
 		bB[NumOfDigits + 1] = {},
 		bC[NumOfDigits + 1] = {},
 		bD[NumOfDigits + 1] = {},
-		bE[NumOfDigits + 1] = {};
+		bE[NumOfDigits + 1] = {},
+		E[NumOfDigits + 1] = {};
 
 	ConversionToBitsVector(A, bA);
 	ConversionToBitsVector(B, bB);
@@ -175,33 +144,33 @@ void makeBitsVectorSet(char* A, char* B, char* C, char* D) {
 	for (int i = 0; i < NumOfDigits; ++i)
 		bE[i] = bA[i] || bB[i] || (bD[i] && bC[i]);
 
-	cout << "The set E was made like bits vector: ";
-	ReverseFromBitsVector(bE);
+	ReverseFromBitsVector(bE, E);
+	cout << "The set E was made like bits vector: " << E << '\n';
 }
 
 /*----------------------------------------------------------
 				   MACHINE WORD FUNCTIONS
-----------------------------------------------------------*/
+  ----------------------------------------------------------*/
 
-short ConversionToMachineWord(char* S) {
+short ConversionToMachineWord(char S[]) {
 	short wS = 0;
 	for (int i = 0; S[i]; ++i)
 		wS |= (1 << (S[i] - '0'));
 	return wS;
 }
 
-void ReverseFromMachineWord(short wS) {
+void ReverseFromMachineWord(short wS, char S[]) {
 	const int NumOfDigits = 10;
-	char S[NumOfDigits + 1] = {};
 	for (int i = 0, k = 0; i < NumOfDigits; ++i)
 		if ((wS >> i) & 1)
 			S[k++] = i + '0';
-	cout << S << endl;
 }
 
-void makeMachineWordSet(char* A, char* B, char* C, char* D) {
-
-	short wA = ConversionToMachineWord(A),
+void makeMachineWordSet(char A[], char B[], char C[], char D[]) {
+	const int NumOfDigits = 10;
+	char E[NumOfDigits + 1] = {};
+	short
+		wA = ConversionToMachineWord(A),
 		wB = ConversionToMachineWord(B),
 		wC = ConversionToMachineWord(C),
 		wD = ConversionToMachineWord(D),
@@ -209,27 +178,22 @@ void makeMachineWordSet(char* A, char* B, char* C, char* D) {
 
 	wE = wA | wB | (wC & wD);
 
-	cout << "The set E was made like machine word: ";
-	ReverseFromMachineWord(wE);
+	ReverseFromMachineWord(wE, E);
+	cout << "The set E was made like machine word: " << E << '\n';
 }
 
 /*----------------------------------------------------------
 						  MAIN
- --------------------------------------------------------*/
+  ----------------------------------------------------------*/
 
 int main() {
-
+	srand(time(0));
 	const int NumOfDigits = 10;
-
-	char A[NumOfDigits + 1] = {},
+	char
+		A[NumOfDigits + 1] = {},
 		B[NumOfDigits + 1] = {},
 		C[NumOfDigits + 1] = {},
 		D[NumOfDigits + 1] = {};
-
-	getSet(A, 'A');
-	getSet(B, 'B');
-	getSet(C, 'C');
-	getSet(D, 'D');
 
 	makeArraySet(A, B, C, D);
 	makeListSet(A, B, C, D);
